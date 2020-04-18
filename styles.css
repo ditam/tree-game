@@ -1,0 +1,47 @@
+﻿
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.wrapper {
+	position: relative;
+	margin: 15px;
+}
+
+.wrapper .tabs {
+	width: 50px;
+	font-size: 22px;
+	font-weight: 700;
+	writing-mode: vertical-lr;
+	transform: rotate(180deg);
+	text-align: center;
+	user-select: none;
+	cursor: pointer;
+}
+
+.wrapper .tabs .tab {
+	display: inline-block;
+	width: 50px;
+	height: 200px;
+	line-height: 50px;
+	text-transform: uppercase;
+
+	background-color: #ddd;
+}
+
+.wrapper .tabs .tab.selected {
+	background-color: #bbb;
+}
+
+.wrapper .tabs .tab:hover {
+	background-color: #bbb;
+}
+
+.wrapper canvas {
+	position: absolute;
+	top: 0;
+	left: 50px; /* .tabs width */
+	border: 1px solid gray;
+}
