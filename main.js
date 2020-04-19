@@ -1,6 +1,7 @@
 ﻿const PARAMS = Object.freeze({
   WIDTH: 950,
   HEIGHT: 600,
+  OUTLINE_WIDTH: 3,
 });
 
 const game = {};
@@ -41,17 +42,33 @@ $(function(){
   function drawScene() {
     clear();
     for (const o of game.objects[currentScene]) {
-      const points = utils.clone(o.points)
+      let points = utils.clone(o.points)
       ctx.save();
       ctx.fillStyle = o.color || 'black';
       ctx.beginPath();
-      const start = points.shift()
+      let start = points.shift()
       ctx.moveTo(start.x, start.y);
       points.forEach(function(point) {
         ctx.lineTo(point.x, point.y);
       });
       ctx.fill();
       ctx.restore();
+
+      if (o.outlined) {
+        points = utils.clone(o.points)
+        ctx.save();
+        ctx.strokeStyle = o.outlineColor || 'black';
+        ctx.lineWidth = PARAMS.OUTLINE_WIDTH;
+        ctx.beginPath();
+        start = points.shift()
+        ctx.moveTo(start.x, start.y);
+        points.forEach(function(point) {
+          ctx.lineTo(point.x, point.y);
+        });
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+      }
     }
   }
 

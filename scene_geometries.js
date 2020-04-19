@@ -13,6 +13,8 @@ game.objects = {
     {
       color: '#da9f33',
       name: 'branch',
+      outlined: true,
+      outlineColor: '#423206',
       points: [
         {x: 0,  y: 0},
         {x: 125, y: 125},
@@ -28,6 +30,8 @@ game.objects = {
     {
       color: 'green',
       name: 'leaf0',
+      outlined: true,
+      outlineColor: '#036117',
       points: [
         {x: 666,  y: 190},
         {x: 610,  y: 160},
@@ -106,8 +110,10 @@ game.objects = {
       ]
     },
     {
-      color: 'black',
+      color: '#423206',
       name: 'tree',
+      outlined: true,
+      outlineColor: 'black',
       points: [
         {x: 600,  y: 0},
         {x: 550, y: 75},
