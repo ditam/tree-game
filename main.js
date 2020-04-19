@@ -4,7 +4,9 @@
   OUTLINE_WIDTH: 3,
 });
 
-const game = {};
+const game = {
+  textures: {}
+};
 
 const utils = {
   clone: function(a) {
@@ -18,9 +20,34 @@ const utils = {
   }
 };
 
+function initTextures(context) {
+  const patternCanvas = document.createElement('canvas');
+  const patternContext = patternCanvas.getContext('2d');
+
+  // leaf
+  patternCanvas.width = 50;
+  patternCanvas.height = 50;
+  patternContext.fillStyle = 'green';
+  patternContext.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+  patternContext.strokeStyle = '#034411';
+  for (let i = 0; i < 20; i++) {
+    patternContext.beginPath();
+    patternContext.moveTo(0, i*10); // NB: size % step should be 0 for tileability
+    patternContext.lineTo(i*10, 0);
+    patternContext.stroke();
+  }
+
+  game.textures.leaf = context.createPattern(patternCanvas, 'repeat');
+}
+
 $(function(){
-  const canvas = $('canvas');
+  const canvas = $('canvas.main');
   const ctx = canvas[0].getContext('2d');
+  initTextures(ctx);
+
+  $('#upgrade-modal .header').on('click', function() {
+    $('#upgrade-modal').toggleClass('hidden');
+  })
 
   const scenes = ['branches', 'trunk', 'roots'];
   let currentScene = 'branches';
@@ -44,7 +71,11 @@ $(function(){
     for (const o of game.objects[currentScene]) {
       let points = utils.clone(o.points)
       ctx.save();
-      ctx.fillStyle = o.color || 'black';
+      if (o.texture) {
+        ctx.fillStyle = game.textures[o.texture];
+      } else {
+        ctx.fillStyle = o.color || 'black';
+      }
       ctx.beginPath();
       let start = points.shift()
       ctx.moveTo(start.x, start.y);

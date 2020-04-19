@@ -1,3 +1,5 @@
+// TODO: express coordinates as fractions instead of pixels,
+//       otherwise parametrizing the canvas size is pointless...
 game.objects = {
   'branches': [
     {
@@ -28,10 +30,10 @@ game.objects = {
       ]
     },
     {
-      color: 'green',
       name: 'leaf0',
       outlined: true,
-      outlineColor: '#036117',
+      outlineColor: '#034411',
+      texture: 'leaf',
       points: [
         {x: 666,  y: 190},
         {x: 610,  y: 160},
@@ -128,6 +130,16 @@ game.objects = {
         {x: 700, y: 150},
         {x: 1100, y: 350},
         {x: 1100, y: 0},
+      ]
+    },
+    {
+      color: 'white',
+      name: 'debug-box',
+      points: [
+        {x: 800,  y: 0},
+        {x: 900,  y: 0},
+        {x: 900,  y: 100},
+        {x: 800,  y: 100}
       ]
     },
   ]
