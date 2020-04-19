@@ -29,20 +29,6 @@ game.objects = {
         {x: 0,  y: 600},
       ]
     },
-    {
-      name: 'leaf0',
-      outlined: true,
-      outlineColor: '#034411',
-      texture: 'leaf',
-      points: [
-        {x: 666,  y: 190},
-        {x: 610,  y: 160},
-        {x: 500,  y: 140},
-        {x: 470,  y: 55},
-        {x: 570,  y: 70},
-        {x: 620,  y: 150},
-      ]
-    },
   ],
   'trunk': [
     {
