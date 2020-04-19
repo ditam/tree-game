@@ -3,6 +3,8 @@
   HEIGHT: 600,
 });
 
+const game = {};
+
 const utils = {
   clone: function(a) {
     return JSON.parse(JSON.stringify(a));
@@ -19,9 +21,13 @@ $(function(){
   const canvas = $('canvas');
   const ctx = canvas[0].getContext('2d');
 
+  const scenes = ['branches', 'trunk', 'roots'];
+  let currentScene = 'branches';
   $('.tab').on('click', function() {
     const clickedTab = $(this);
-    // clickedTab.index() -> 0, 1, 2
+    currentScene = scenes[clickedTab.index()];
+    console.log('scene set to:', currentScene);
+    drawScene();
     $('.tab').removeClass('selected')
     clickedTab.addClass('selected');
   })
@@ -32,20 +38,12 @@ $(function(){
   ctx.fillStyle = '#041';
   ctx.font = '24px serif';
 
-  const objects = [
-    {
-      points: [
-        {x: 25,  y: 0},
-        {x: 125, y: 125},
-        {x: 75,  y: 250},
-        {x: 25,  y: 250},
-      ]
-    },
-  ];
-
-  function drawObjects() {
-    for (const o of objects) {
+  function drawScene() {
+    clear();
+    for (const o of game.objects[currentScene]) {
       const points = utils.clone(o.points)
+      ctx.save();
+      ctx.fillStyle = o.color || 'black';
       ctx.beginPath();
       const start = points.shift()
       ctx.moveTo(start.x, start.y);
@@ -53,6 +51,7 @@ $(function(){
         ctx.lineTo(point.x, point.y);
       });
       ctx.fill();
+      ctx.restore();
     }
   }
 
@@ -60,14 +59,13 @@ $(function(){
     ctx.clearRect(0, 0, PARAMS.WIDTH, PARAMS.HEIGHT);
   }
 
-  drawObjects();
+  drawScene();
 
   // debug: if CTRL is pressed, we display the mouse coords, log on click
   canvas.on('mousemove', function(e) {
     if (e.ctrlKey) {
       const coords = utils.getCoords(canvas, e);
-      clear();
-      drawObjects();
+      drawScene();
       ctx.save();
       ctx.fillStyle = 'black';
       ctx.fillText('x: ' + coords.x + ' y: ' + coords.y, coords.x, coords.y);
