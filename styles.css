@@ -10,6 +10,7 @@ body {
   position: relative;
   margin: 0;
   overflow: hidden;
+  width: 1150px;
 }
 
 .wrapper .toolbar {
@@ -25,6 +26,10 @@ body {
   cursor: pointer;
 
   background-image: url('assets/images/tree-silhouette.png');
+}
+
+.wrapper .tabs.game-over {
+  filter: grayscale(1);
 }
 
 .wrapper .tabs .tab {
@@ -256,6 +261,58 @@ body {
   opacity: 0.6;
 }
 
+/* Game over modal */
+.wrapper #game-over-modal {
+  position: absolute;
+  display: table;
+  top: 200px;
+  left: 450px;
+  width: 400px;
+  height: 220px;
+
+  background-color: gray;
+  border: 1px solid black;
+  cursor: pointer;
+
+  text-align: center;
+
+  transition: top 1s ease;
+}
+
+.wrapper #game-over-modal.hidden {
+  top: -700px;
+}
+
+.wrapper #game-over-modal .wrapper {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.wrapper #game-over-modal .wrapper .header {
+  padding-top: 20px;
+}
+
+.wrapper #game-over-modal .wrapper .message {
+  padding: 20px;
+}
+
+.wrapper #game-over-modal .wrapper .button {
+  padding: 10px 0;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+  background-color: #aaa;
+}
+
+.wrapper #game-over-modal .wrapper .button:hover {
+  padding: 10px 0;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+  background-color: transparent;
+}
+
 /* Inlined resource icons */
 .resource {
   font-weight: 700;
@@ -304,7 +361,39 @@ body {
   margin: 0 6px 0 0;
 }
 
-/* main buttons */
+/* Main buttons */
+
+#time-controls {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  cursor: pointer;
+}
+
+#time-controls > div {
+  display: inline-block;
+}
+
+#time-controls .message {
+  font-size: 20px;
+  left: 0;
+  vertical-align: top;
+  padding-top: 10px;
+  padding-right: 10px;
+  font-weight: 700;
+  text-shadow: 1px 1px 1px white;
+}
+
+#time-controls #next-month-button {
+  width: 0;
+  border: 24px solid transparent;
+  border-left: 24px solid #b10a0a;
+  opacity: 0.8;
+}
+
+#time-controls:hover #next-month-button {
+  opacity: 1;
+}
 
 #buttons-container {
   position: absolute;

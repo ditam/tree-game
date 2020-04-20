@@ -3,6 +3,9 @@
   HEIGHT: 600,
   OUTLINE_WIDTH: 3,
   LEAVES_PER_BRANCH: 20,
+  TRUNK_WEIGHT: 1,
+  BRANCH_WEIGHT: 1,
+  ROOT_CAPACITY: 2,
 });
 
 const game = {
@@ -16,20 +19,16 @@ const game = {
     tree: {
       leaves: 0,
       branches: 1,
-    }
+      trunkSize: 1,
+      rootSize: 1,
+      hasFeeder: false,
+      feederAge: undefined,
+    },
+    year: 7,
+    month: 6,
+    isOver: false,
   },
-};
-
-const utils = {
-  clone: function(a) {
-    return JSON.parse(JSON.stringify(a));
-  },
-  getCoords: function(canvas, mouseEvent) {
-    const rect = canvas[0].getBoundingClientRect();
-    const x = mouseEvent.clientX - rect.left;
-    const y = mouseEvent.clientY - rect.top;
-    return {x: x, y: y};
-  }
+  currentScene: 'branches',
 };
 
 function initTextures(context) {
@@ -50,22 +49,6 @@ function initTextures(context) {
   }
 
   game.textures.leaf = context.createPattern(patternCanvas, 'repeat');
-}
-
-function updateToolbar() {
-  $('.toolbar').empty();
-  const resources = utils.clone(game.state.resources);
-  let sHTML = ' -- ';
-  ['carb', 'stem', 'water'].forEach(function(resName) {
-    sHTML += '<span class="resource ' + resName + '">' + resources[resName] + '</span>';
-  });
-
-  // TODO: remove or hide behind debug flag, this will not be here, just drawn
-  sHTML += ', leaves:' + game.state.tree.leaves;
-  sHTML += ', branches:' + game.state.tree.branches;
-
-  sHTML += ' ... and other stuff will be here too, thank you.';
-  $('.toolbar').html(sHTML);
 }
 
 function renderUpgrades(scene) {
@@ -116,7 +99,7 @@ function payCost(cost) {
   game.state.resources.carb -= cost[0];
   game.state.resources.stem -= cost[1];
   game.state.resources.water -= cost[2];
-  updateToolbar();
+  game.ui.updateToolbar();
 }
 
 // TODO: currently there's a slight issue in which we sell leaves in batches,
@@ -157,7 +140,7 @@ function renderButtons(scene) {
       }
       payCost(cost);
       game.state.tree.leaves += leafBatchSize;
-      updateToolbar();
+      game.ui.updateToolbar();
       console.log('New leaf count:', game.state.tree.leaves);
     });
   } else if (scene === 'trunk') {
@@ -173,40 +156,80 @@ function renderButtons(scene) {
       }
       payCost(cost);
       game.state.tree.branches++;
-      updateToolbar();
+      game.ui.updateToolbar();
       console.log('New branch count:', game.state.tree.branches);
     });
   }
+}
+
+function checkDeath() {
+  // if the biomass exceeds the root capacity, the tree topples over
+  const branches = game.state.tree.branches;
+  const wBranch = PARAMS.BRANCH_WEIGHT;
+  const trunkSize = game.state.tree.trunkSize;
+  const wTrunk = PARAMS.TRUNK_WEIGHT;
+  const roots = game.state.tree.rootSize;
+  if ((branches * wBranch + trunkSize * wTrunk) > roots * PARAMS.ROOT_CAPACITY) {
+    game.state.isOver = true;
+    console.log('DEAD');
+    $('#game-over-modal .message').text(
+      'The roots could not bear the weight of the trunk and the branches, ' +
+      'and a gust of wind turned it out of the ground.'
+    )
+    $('#game-over-modal').removeClass('hidden');
+    $('#game-over-modal .button').on('click', game.resetState);
+    $('.wrapper .tabs').addClass('game-over');
+    return;
+  }
+  console.log('ALIVE');
+}
+
+function advanceMonth() {
+  game.state.month++;
+  if (game.state.month === 12) {
+    game.state.month = 0;
+    game.state.year++;
+  }
+
+  checkDeath();
+
+  game.ui.updateToolbar();
 }
 
 $(function(){
   const canvas = $('canvas.main');
   const ctx = canvas[0].getContext('2d');
   initTextures(ctx);
-  updateToolbar();
+  game.ui.updateToolbar();
 
   $('#upgrade-modal .header').on('click', function() {
     $('#upgrade-modal').toggleClass('hidden');
-  })
+  });
+
+  $('#time-controls').on('click', function() {
+    // We only display the help text before the first click
+    $('#time-controls .message').remove();
+    advanceMonth();
+    game.drawScene();
+  });
 
   const scenes = ['branches', 'trunk', 'roots'];
-  let currentScene = 'branches';
 
   let animationTimer = 0;
   setInterval(function() {animationTimer++;}, 16); // 60FPS, baby! // TODO: 4K support
 
   // TODO: if we had a nice setScene method, this duplication would not be necessary...
-  renderUpgrades(currentScene);
-  renderButtons(currentScene);
+  renderUpgrades(game.currentScene);
+  renderButtons(game.currentScene);
 
   $('.tab').on('click', function() {
     const clickedTab = $(this);
-    currentScene = scenes[clickedTab.index()];
+    game.currentScene = scenes[clickedTab.index()];
     // animations run in the first few seconds of scenes
     animationTimer = 0;
-    renderUpgrades(currentScene);
-    renderButtons(currentScene);
-    drawScene();
+    renderUpgrades(game.currentScene);
+    renderButtons(game.currentScene);
+    game.drawScene();
     $('.tab').removeClass('selected')
     clickedTab.addClass('selected');
   })
@@ -233,7 +256,7 @@ $(function(){
   function drawLeaf(x0, y0, rotationInDegrees, isFalling) {
     const rotation = rotationInDegrees * Math.PI / 180
     const rotationOffset = isFalling? -animationTimer/100 : 0;
-    let points = utils.clone(leaf1.points)
+    let points = game.utils.clone(leaf1.points)
     const yOffset = isFalling? animationTimer+animationTimer*animationTimer/300 : 0;
     const xOffset = isFalling? animationTimer*animationTimer/100 + Math.sin(animationTimer/10) : 0;
     ctx.save();
@@ -263,11 +286,19 @@ $(function(){
     ctx.restore();
   }
 
-  function drawScene() {
+  game.drawScene = function() {
+    if (game.state.isOver) {
+      // NB: this will not work on Safari desktop nor iOS, see
+      // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter#Browser_compatibility
+      //ctx.filter = 'grayscale(1)';
+      game.currentScene = 'branches';
+    } else {
+      ctx.filter = 'none';
+    }
     clear();
-    for (const o of game.objects[currentScene]) {
+    for (const o of game.objects[game.currentScene]) {
       // NB: if this ever becomes a performance issue, just drop it and the .shift() below
-      let points = utils.clone(o.points)
+      let points = game.utils.clone(o.points)
       ctx.save();
       if (o.texture) {
         ctx.fillStyle = game.textures[o.texture];
@@ -283,7 +314,7 @@ $(function(){
       ctx.fill();
 
       if (o.outlined) {
-        points = utils.clone(o.points)
+        points = game.utils.clone(o.points)
         ctx.save();
         ctx.strokeStyle = o.outlineColor || 'black';
         ctx.lineWidth = PARAMS.OUTLINE_WIDTH;
@@ -301,19 +332,19 @@ $(function(){
       ctx.restore();
     }
 
-    if (currentScene == 'branches') {
-      drawLeaf(0, 0, 0, true);
-      drawLeaf(110, 130, 0);
-      drawLeaf(110, 130, 20, true);
-      drawLeaf(110, 130, 30);
-      drawLeaf(220, 305, 120, true);
-      drawLeaf(580, 250, 140, true);
-      drawLeaf(705, 165, 250);
-      drawLeaf(705, 165, 200, true);
+    if (game.currentScene == 'branches') {
+      drawLeaf(0, 0, 0, game.state.isOver || true);
+      drawLeaf(110, 130, 0, game.state.isOver);
+      drawLeaf(110, 130, 20, game.state.isOver || true);
+      drawLeaf(110, 130, 30, game.state.isOver);
+      drawLeaf(220, 305, 120, game.state.isOver || true);
+      drawLeaf(580, 250, 140, game.state.isOver || true);
+      drawLeaf(705, 165, 250, game.state.isOver);
+      drawLeaf(705, 165, 200, game.state.isOver || true);
     }
 
     if (animationTimer < 400) {
-      requestAnimationFrame(drawScene);
+      requestAnimationFrame(game.drawScene);
     }
   }
 
@@ -321,14 +352,14 @@ $(function(){
     ctx.clearRect(0, 0, PARAMS.WIDTH, PARAMS.HEIGHT);
   }
 
-  drawScene();
+  game.drawScene();
 
   // FIXME: hide behind debug flag (with the recursive requestAnimationFrame it's a mess.)
   // debug: if CTRL is pressed, we display the mouse coords, log on click
   canvas.on('mousemove', function(e) {
     if (e.ctrlKey) {
-      const coords = utils.getCoords(canvas, e);
-      drawScene();
+      const coords = game.utils.getCoords(canvas, e);
+      game.drawScene();
       ctx.save();
       ctx.fillStyle = 'black';
       ctx.fillText('x: ' + coords.x + ' y: ' + coords.y, coords.x, coords.y);
@@ -337,7 +368,7 @@ $(function(){
   });
   canvas.on('mousedown', function(e) {
     if (e.ctrlKey) {
-      const coords = utils.getCoords(canvas, e);
+      const coords = game.utils.getCoords(canvas, e);
       console.log(JSON.stringify(coords) + ',');
     }
   });
