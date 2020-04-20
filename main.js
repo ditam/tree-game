@@ -132,9 +132,10 @@ function renderButtons(scene) {
   if (scene === 'branches') {
     const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow new leaves');
     $('#buttons-container').append(addLeavesButton);
-    const cost = [50, 100, 200];
+    const cost = [50, 100, 350];
     const leafBatchSize = 5; // TODO: move to params or make dynamic based on current count
     addLeavesButton.on('click', function() {
+      if (game.state.isOver) { return; }
       if (!checkCost(cost)) {
         return;
       }
@@ -150,6 +151,7 @@ function renderButtons(scene) {
     $('#buttons-container').append(addBranchButton);
     const cost = [50, 100, 200];
     addBranchButton.on('click', function() {
+      if (game.state.isOver) { return; }
       if (!checkCost(cost)) {
         return;
       }
@@ -163,7 +165,20 @@ function renderButtons(scene) {
   }
 }
 
+function consumeResources() {
+  const leaves = game.state.tree.leaves;
+  game.state.resources.carb += leaves;
+  game.state.resources.water -= leaves;
+}
+
 function checkDeath() {
+  function endGame(message) {
+    game.state.isOver = true;
+    $('#game-over-modal .message').text(message);
+    $('#game-over-modal').removeClass('hidden');
+    $('#game-over-modal .button').on('click', game.resetState);
+    $('.wrapper .tabs').addClass('game-over');
+  }
   // if the biomass exceeds the root capacity, the tree topples over
   const branches = game.state.tree.branches;
   const wBranch = PARAMS.BRANCH_WEIGHT;
@@ -171,14 +186,16 @@ function checkDeath() {
   const wTrunk = PARAMS.TRUNK_WEIGHT;
   const roots = game.state.tree.rootSize;
   if ((branches * wBranch + trunkSize * wTrunk) > roots * PARAMS.ROOT_CAPACITY) {
-    game.state.isOver = true;
-    $('#game-over-modal .message').text(
-      'The roots could not bear the weight of the trunk and the branches, ' +
-      'and a gust of wind turned it out of the ground.'
-    )
-    $('#game-over-modal').removeClass('hidden');
-    $('#game-over-modal .button').on('click', game.resetState);
-    $('.wrapper .tabs').addClass('game-over');
+    message = 'The roots could not bear the weight of the trunk and the branches, ' +
+              'and a gust of wind turned it out of the ground.';
+    endGame(message);
+    return;
+  }
+  // if all the water has been spent, the tree dies from drying out
+  if (game.state.resources.water < 0) {
+    message = 'After using up all of its water reserves, it could not sustain its ' +
+              ' most fundamental functions.';
+    endGame(message);
     return;
   }
 }
@@ -191,6 +208,8 @@ function advanceMonth() {
   }
 
   game.animationTimer = 0;
+
+  consumeResources();
 
   checkDeath();
 
@@ -217,16 +236,12 @@ $(function(){
   game.ui.updateToolbar();
 
   $('#upgrade-modal .header').on('click', function() {
-    if (game.state.isOver) {
-      return;
-    }
+    if (game.state.isOver) { return; }
     $('#upgrade-modal').toggleClass('hidden');
   });
 
   $('#time-controls').on('click', function() {
-    if (game.state.isOver) {
-      return;
-    }
+    if (game.state.isOver) { return; }
     // We only display the help text before the first click
     $('#time-controls .message').remove();
     advanceMonth();
@@ -234,9 +249,7 @@ $(function(){
   });
 
   $('.tab').on('click', function() {
-    if (game.state.isOver) {
-      return;
-    }
+    if (game.state.isOver) { return; }
     const clickedTab = $(this);
     game.setScene(game.scenes[clickedTab.index()]);
   })
