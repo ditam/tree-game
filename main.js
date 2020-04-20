@@ -2,6 +2,7 @@
   WIDTH: 950,
   HEIGHT: 600,
   OUTLINE_WIDTH: 3,
+  LEAVES_PER_BRANCH: 20,
 });
 
 const game = {
@@ -118,18 +119,40 @@ function payCost(cost) {
   updateToolbar();
 }
 
+// TODO: currently there's a slight issue in which we sell leaves in batches,
+// so we are not guaranteed to fill the capacity perfectly. This is probably not a big deal though.
+// -> (returns boolean canHold, same as checkCost)
+function checkCapacity(objectName, attemptedAddCount) {
+  const deciders = {
+    leaves: function(attemptedAddCount) {
+      const maxCapacity = game.state.tree.branches * PARAMS.LEAVES_PER_BRANCH;
+      const proposedCount = (game.state.tree.leaves + attemptedAddCount);
+      if (proposedCount > maxCapacity) {
+        showError('Can not add leaves - branches are at full capacity.');
+        return false;
+      }
+      return true;
+    },
+  }
+  return deciders[objectName](attemptedAddCount);
+}
+
 function renderButtons(scene) {
   $('#buttons-container').empty();
   if (scene === 'branches') {
     const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow leaves');
     $('#buttons-container').append(addLeavesButton);
-    const cost = [50, 100, 520];
+    const cost = [50, 100, 200];
+    const leafBatchSize = 5; // TODO: move to params or make dynamic based on current count
     addLeavesButton.on('click', function() {
       if (!checkCost(cost)) {
         return;
       }
+      if (!checkCapacity('leaves', leafBatchSize)) {
+        return;
+      }
       payCost(cost);
-      game.state.tree.leaves += 10;
+      game.state.tree.leaves += leafBatchSize;
       updateToolbar();
       console.log('New leaf count:', game.state.tree.leaves);
     });
