@@ -6,6 +6,7 @@
   TRUNK_WEIGHT: 1,
   BRANCH_WEIGHT: 1,
   ROOT_CAPACITY: 2,
+  DEBUG: true,
 });
 
 const game = {
@@ -28,6 +29,8 @@ const game = {
     month: 6,
     isOver: false,
   },
+  animationTimer: 0,
+  scenes: ['branches', 'trunk', 'roots'],
   currentScene: 'branches',
 };
 
@@ -141,7 +144,6 @@ function renderButtons(scene) {
       payCost(cost);
       game.state.tree.leaves += leafBatchSize;
       game.ui.updateToolbar();
-      console.log('New leaf count:', game.state.tree.leaves);
     });
   } else if (scene === 'trunk') {
     const addBranchButton = $('<div>').addClass('button add-branches').text('Grow branches');
@@ -157,7 +159,6 @@ function renderButtons(scene) {
       payCost(cost);
       game.state.tree.branches++;
       game.ui.updateToolbar();
-      console.log('New branch count:', game.state.tree.branches);
     });
   }
 }
@@ -171,7 +172,6 @@ function checkDeath() {
   const roots = game.state.tree.rootSize;
   if ((branches * wBranch + trunkSize * wTrunk) > roots * PARAMS.ROOT_CAPACITY) {
     game.state.isOver = true;
-    console.log('DEAD');
     $('#game-over-modal .message').text(
       'The roots could not bear the weight of the trunk and the branches, ' +
       'and a gust of wind turned it out of the ground.'
@@ -181,7 +181,6 @@ function checkDeath() {
     $('.wrapper .tabs').addClass('game-over');
     return;
   }
-  console.log('ALIVE');
 }
 
 function advanceMonth() {
@@ -196,181 +195,81 @@ function advanceMonth() {
   game.ui.updateToolbar();
 }
 
+game.setScene = function(scene) {
+  game.currentScene = scene;
+  // animations run in the first few seconds of scenes
+  game.animationTimer = 0;
+  renderUpgrades(game.currentScene);
+  renderButtons(game.currentScene);
+  game.drawScene();
+  $('.wrapper .tab').removeClass('selected');
+  const sceneIndex = game.scenes.indexOf(game.currentScene);
+  $('.wrapper .tab').eq(sceneIndex).addClass('selected');
+}
+
 $(function(){
   const canvas = $('canvas.main');
-  const ctx = canvas[0].getContext('2d');
+  game.ctx = canvas[0].getContext('2d');
+  const ctx = game.ctx;
   initTextures(ctx);
   game.ui.updateToolbar();
 
   $('#upgrade-modal .header').on('click', function() {
+    if (game.state.isOver) {
+      return;
+    }
     $('#upgrade-modal').toggleClass('hidden');
   });
 
   $('#time-controls').on('click', function() {
+    if (game.state.isOver) {
+      return;
+    }
     // We only display the help text before the first click
     $('#time-controls .message').remove();
     advanceMonth();
     game.drawScene();
   });
 
-  const scenes = ['branches', 'trunk', 'roots'];
-
-  let animationTimer = 0;
-  setInterval(function() {animationTimer++;}, 16); // 60FPS, baby! // TODO: 4K support
-
-  // TODO: if we had a nice setScene method, this duplication would not be necessary...
-  renderUpgrades(game.currentScene);
-  renderButtons(game.currentScene);
-
   $('.tab').on('click', function() {
+    if (game.state.isOver) {
+      return;
+    }
     const clickedTab = $(this);
-    game.currentScene = scenes[clickedTab.index()];
-    // animations run in the first few seconds of scenes
-    animationTimer = 0;
-    renderUpgrades(game.currentScene);
-    renderButtons(game.currentScene);
-    game.drawScene();
-    $('.tab').removeClass('selected')
-    clickedTab.addClass('selected');
+    game.setScene(game.scenes[clickedTab.index()]);
   })
 
   canvas.attr('width', PARAMS.WIDTH+'px');
   canvas.attr('height', PARAMS.HEIGHT+'px');
 
-  ctx.fillStyle = '#041';
   ctx.font = '24px serif';
 
-  const leaf1 = {
-    name: 'leaf1',
-    outlined: true,
-    outlineColor: 'black',
-    texture: 'leaf',
-    points: [
-      {x: 0,  y: 0},
-      {x: 50,  y: 30},
-      {x: 110,  y: 110, controlX: 85, controlY: 15},
-      {x: 40,  y: 35, controlX: 30, controlY: 80},
-    ]
-  };
-
-  function drawLeaf(x0, y0, rotationInDegrees, isFalling) {
-    const rotation = rotationInDegrees * Math.PI / 180
-    const rotationOffset = isFalling? -animationTimer/100 : 0;
-    let points = game.utils.clone(leaf1.points)
-    const yOffset = isFalling? animationTimer+animationTimer*animationTimer/300 : 0;
-    const xOffset = isFalling? animationTimer*animationTimer/100 + Math.sin(animationTimer/10) : 0;
-    ctx.save();
-    ctx.translate(x0 + xOffset, y0 + yOffset);
-    // NB: first move, then rotate, so that we rotate around the new origin
-    ctx.rotate(rotation + rotationOffset);
-    if (leaf1.texture) {
-      ctx.fillStyle = game.textures[leaf1.texture];
-    } else {
-      ctx.fillStyle = leaf1.color || 'black';
-    }
-    ctx.strokeStyle = leaf1.outlineColor || 'black';
-    ctx.lineWidth = PARAMS.OUTLINE_WIDTH;
-    ctx.beginPath();
-    let start = points.shift()
-    ctx.moveTo(start.x, start.y);
-    points.forEach(function(p) {
-      if (p.controlX !== undefined) {
-        ctx.quadraticCurveTo(p.controlX, p.controlY, p.x, p.y);
-      } else {
-        ctx.lineTo(p.x, p.y);
-      }
-    });
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  game.drawScene = function() {
-    if (game.state.isOver) {
-      // NB: this will not work on Safari desktop nor iOS, see
-      // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter#Browser_compatibility
-      //ctx.filter = 'grayscale(1)';
-      game.currentScene = 'branches';
-    } else {
-      ctx.filter = 'none';
-    }
-    clear();
-    for (const o of game.objects[game.currentScene]) {
-      // NB: if this ever becomes a performance issue, just drop it and the .shift() below
-      let points = game.utils.clone(o.points)
-      ctx.save();
-      if (o.texture) {
-        ctx.fillStyle = game.textures[o.texture];
-      } else {
-        ctx.fillStyle = o.color || 'black';
-      }
-      ctx.beginPath();
-      let start = points.shift()
-      ctx.moveTo(start.x, start.y);
-      points.forEach(function(point) {
-        ctx.lineTo(point.x, point.y);
-      });
-      ctx.fill();
-
-      if (o.outlined) {
-        points = game.utils.clone(o.points)
-        ctx.save();
-        ctx.strokeStyle = o.outlineColor || 'black';
-        ctx.lineWidth = PARAMS.OUTLINE_WIDTH;
-        ctx.beginPath();
-        start = points.shift()
-        ctx.moveTo(start.x, start.y);
-        points.forEach(function(point) {
-          ctx.lineTo(point.x, point.y);
-        });
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      ctx.restore();
-    }
-
-    if (game.currentScene == 'branches') {
-      drawLeaf(0, 0, 0, game.state.isOver || true);
-      drawLeaf(110, 130, 0, game.state.isOver);
-      drawLeaf(110, 130, 20, game.state.isOver || true);
-      drawLeaf(110, 130, 30, game.state.isOver);
-      drawLeaf(220, 305, 120, game.state.isOver || true);
-      drawLeaf(580, 250, 140, game.state.isOver || true);
-      drawLeaf(705, 165, 250, game.state.isOver);
-      drawLeaf(705, 165, 200, game.state.isOver || true);
-    }
-
-    if (animationTimer < 400) {
-      requestAnimationFrame(game.drawScene);
-    }
-  }
-
-  function clear() {
-    ctx.clearRect(0, 0, PARAMS.WIDTH, PARAMS.HEIGHT);
-  }
+  game.setScene(game.currentScene);
+  setInterval(function() {game.animationTimer++;}, 16); // 60FPS, baby! // TODO: 4K support
+  // TODO: maybe we should use the timestamp passed to the requestAnimationFrame callback instead...
 
   game.drawScene();
 
-  // FIXME: hide behind debug flag (with the recursive requestAnimationFrame it's a mess.)
-  // debug: if CTRL is pressed, we display the mouse coords, log on click
-  canvas.on('mousemove', function(e) {
-    if (e.ctrlKey) {
-      const coords = game.utils.getCoords(canvas, e);
-      game.drawScene();
-      ctx.save();
-      ctx.fillStyle = 'black';
-      ctx.fillText('x: ' + coords.x + ' y: ' + coords.y, coords.x, coords.y);
-      ctx.restore();
-    }
-  });
-  canvas.on('mousedown', function(e) {
-    if (e.ctrlKey) {
-      const coords = game.utils.getCoords(canvas, e);
-      console.log(JSON.stringify(coords) + ',');
-    }
-  });
+  if (PARAMS.DEBUG) {
+    // debug: if CTRL is pressed, we display the mouse coords, log on click
+    // Note that with the recursive requestAnimationFrame, this results in a mess,
+    // so you probably can't debug animation issues while using it.
+    canvas.on('mousemove', function(e) {
+      if (e.ctrlKey) {
+        const coords = game.utils.getCoords(canvas, e);
+        game.drawScene();
+        ctx.save();
+        ctx.fillStyle = 'black';
+        ctx.fillText('x: ' + coords.x + ' y: ' + coords.y, coords.x, coords.y);
+        ctx.restore();
+      }
+    });
+    canvas.on('mousedown', function(e) {
+      if (e.ctrlKey) {
+        const coords = game.utils.getCoords(canvas, e);
+        console.log(JSON.stringify(coords) + ',');
+      }
+    });
+  }
 
 });
