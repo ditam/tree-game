@@ -32,8 +32,8 @@ function initTextures(context) {
   patternContext.strokeStyle = '#034411';
   for (let i = 0; i < 20; i++) {
     patternContext.beginPath();
-    patternContext.moveTo(0, i*10); // NB: size % step should be 0 for tileability
-    patternContext.lineTo(i*10, 0);
+    patternContext.moveTo(0, i*5); // NB: size % step should be 0 for tileability
+    patternContext.lineTo(i*25, 0);
     patternContext.stroke();
   }
 
