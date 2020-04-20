@@ -133,6 +133,10 @@ function checkCapacity(objectName, attemptedAddCount) {
       }
       return true;
     },
+    branches: function(attemptedAddCount) {
+      // NB: branch growth is always allowed, but the tree biomass might exceed the root capacity
+      return true;
+    }
   }
   return deciders[objectName](attemptedAddCount);
 }
@@ -140,7 +144,7 @@ function checkCapacity(objectName, attemptedAddCount) {
 function renderButtons(scene) {
   $('#buttons-container').empty();
   if (scene === 'branches') {
-    const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow leaves');
+    const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow new leaves');
     $('#buttons-container').append(addLeavesButton);
     const cost = [50, 100, 200];
     const leafBatchSize = 5; // TODO: move to params or make dynamic based on current count
@@ -155,6 +159,22 @@ function renderButtons(scene) {
       game.state.tree.leaves += leafBatchSize;
       updateToolbar();
       console.log('New leaf count:', game.state.tree.leaves);
+    });
+  } else if (scene === 'trunk') {
+    const addBranchButton = $('<div>').addClass('button add-branches').text('Grow branches');
+    $('#buttons-container').append(addBranchButton);
+    const cost = [50, 100, 200];
+    addBranchButton.on('click', function() {
+      if (!checkCost(cost)) {
+        return;
+      }
+      if (!checkCapacity('branches', 1)) {
+        return;
+      }
+      payCost(cost);
+      game.state.tree.branches++;
+      updateToolbar();
+      console.log('New branch count:', game.state.tree.branches);
     });
   }
 }
