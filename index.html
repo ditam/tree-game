@@ -11,12 +11,14 @@
 </head>
 <body>
 	<div class="wrapper">
+    <div class="toolbar"></div>
 		<div class="tabs">
 			<div class="tab selected">Branches</div>
 			<div class="tab">Trunk</div>
 			<div class="tab">Roots</div>
 		</div>
   	<canvas class="main"></canvas>
+    <div id="buttons-container"></div>
   	<div id="upgrade-modal" class="hidden">
   		<div class="header">
   			<span class="arrow"></span>
@@ -52,6 +54,10 @@
   			</div>
   		</div>
   	</div>
+    <div id="error-modal" class="hidden">
+      <div class="message"></div>
+      <div class="footer">Click to dismiss</div>
+    </div>
 	</div>
 </body>
 </html>

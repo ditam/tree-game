@@ -8,8 +8,14 @@ body {
 
 .wrapper {
   position: relative;
-  margin: 15px;
+  margin: 0;
   overflow: hidden;
+}
+
+.wrapper .toolbar {
+  width: 1150px;
+  background-color: #eee;
+  height: 30px;
 }
 
 .wrapper .tabs {
@@ -42,7 +48,7 @@ body {
 
 .wrapper canvas {
   position: absolute;
-  top: 0;
+  top: 30px; /* .toolbar height - move upgrade-modal too when changing, maybe error-modal as well */
   left: 200px; /* .tabs width */
 }
 
@@ -50,7 +56,7 @@ body {
 
 .wrapper #upgrade-modal {
   position: absolute;
-  top: 50px;
+  top: 80px; /* 50 + toolbar height */
   left: 300px;
   width: 700px;
   height: 500px;
@@ -59,7 +65,7 @@ body {
 }
 
 .wrapper #upgrade-modal.hidden {
-  top: 550px;
+  top: 580px; /* 550 + toolbar height */
 }
 
 .wrapper #upgrade-modal > .header {
@@ -213,8 +219,43 @@ body {
   background-color: green;
 }
 
-/* Inlined resource icons */
+/* Error modal */
+.wrapper #error-modal {
+  position: absolute;
+  display: table;
+  top: 250px;
+  left: 500px;
+  width: 300px;
+  height: 150px;
 
+  background-color: rgba(150,10,10,0.7);
+  cursor: pointer;
+
+  text-align: center;
+
+  transition: top 0.3s ease;
+}
+
+.wrapper #error-modal.hidden {
+  top: 700px;
+}
+
+.wrapper #error-modal .message {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.wrapper #error-modal .footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  font-style: italic;
+  opacity: 0.6;
+}
+
+/* Inlined resource icons */
 .resource {
   font-weight: 700;
   white-space: nowrap; /* this forbids wrapping the icon and text into separate lines */
@@ -260,4 +301,23 @@ body {
   width: 20px;
   height: 20px;
   margin: 0 6px 0 0;
+}
+
+/* main buttons */
+
+#buttons-container {
+  position: absolute;
+  left: 350px;
+  top: 400px;
+}
+
+#buttons-container .button {
+  width: 100px;
+  height: 50px;
+  border: 1px solid black;
+  background-color: white;
+  cursor: pointer;
+}
+
+#buttons-container .button.add-leaves {
 }

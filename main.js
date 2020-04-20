@@ -5,7 +5,18 @@
 });
 
 const game = {
-  textures: {}
+  textures: {},
+  state: { // NB: whenever you change the state, update the UI, at least the toolbar
+    resources: {
+      carb: 150,
+      stem: 300,
+      water: 700,
+    },
+    tree: {
+      leaves: 0,
+      branches: 1,
+    }
+  },
 };
 
 const utils = {
@@ -40,13 +51,27 @@ function initTextures(context) {
   game.textures.leaf = context.createPattern(patternCanvas, 'repeat');
 }
 
+function updateToolbar() {
+  $('.toolbar').empty();
+  const resources = utils.clone(game.state.resources);
+  let sHTML = ' -- ';
+  ['carb', 'stem', 'water'].forEach(function(resName) {
+    sHTML += '<span class="resource ' + resName + '">' + resources[resName] + '</span>';
+  });
+
+  // TODO: remove or hide behind debug flag, this will not be here, just drawn
+  sHTML += ', leaves:' + game.state.tree.leaves;
+  sHTML += ', branches:' + game.state.tree.branches;
+
+  sHTML += ' ... and other stuff will be here too, thank you.';
+  $('.toolbar').html(sHTML);
+}
+
 function renderUpgrades(scene) {
   const sceneUpgrades = game.upgrades[scene];
-  console.log('scene upg:', sceneUpgrades);
   $('#upgrade-modal .content .header').html(sceneUpgrades.description);
   sceneUpgrades.items.forEach(function(item, i) {
     const row = $('#upgrade-modal .content .row').eq(i);
-    console.log('row for item:', row);
     const icon = $('<img>').attr('src', 'assets/images/' + item.icon + '.png').css('width', '64px').css('height', '64px');
     row.find('.icon').empty().append(icon);
     row.find('.title').html(item.name);
@@ -60,10 +85,62 @@ function renderUpgrades(scene) {
   });
 }
 
+function showError(message) {
+  $('#error-modal').removeClass('hidden');
+  $('#error-modal .message').html(message);
+  $('#error-modal').on('click', function() {$('#error-modal').addClass('hidden');});
+}
+
+// Given an array of [carb, stem, water] costs, checks whether they can be paid from the current balance,
+// and if not, displays an error message.
+// -> (returns boolean canAfford)
+function checkCost(cost) {
+  if (cost[0] > game.state.resources.carb) {
+    showError('Can not afford - not enough <span class="resource carb">carbohydrates</span> (needs ' + cost[0] + ')');
+    return false;
+  }
+  if (cost[1] > game.state.resources.stem) {
+    showError('Can not afford - not enough <span class="resource stem">meristematic cells</span> (needs ' + cost[1] + ')');
+    return false;
+  }
+  if (cost[2] > game.state.resources.water) {
+    showError('Can not afford - not enough <span class="resource water">water</span> (needs ' + cost[2] + ')');
+    return false;
+  }
+  return true;
+}
+
+// use checkCost first, this is not python!
+function payCost(cost) {
+  game.state.resources.carb -= cost[0];
+  game.state.resources.stem -= cost[1];
+  game.state.resources.water -= cost[2];
+  updateToolbar();
+}
+
+function renderButtons(scene) {
+  $('#buttons-container').empty();
+  if (scene === 'branches') {
+    const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow leaves');
+    $('#buttons-container').append(addLeavesButton);
+    const cost = [50, 100, 520];
+    addLeavesButton.on('click', function() {
+      if (!checkCost(cost)) {
+        return;
+      }
+      payCost(cost);
+      game.state.tree.leaves += 10;
+      updateToolbar();
+      console.log('New leaf count:', game.state.tree.leaves);
+    });
+  }
+}
+
 $(function(){
   const canvas = $('canvas.main');
   const ctx = canvas[0].getContext('2d');
   initTextures(ctx);
+  updateToolbar();
 
   $('#upgrade-modal .header').on('click', function() {
     $('#upgrade-modal').toggleClass('hidden');
@@ -73,10 +150,11 @@ $(function(){
   let currentScene = 'branches';
 
   let animationTimer = 0;
-  setInterval(function() {animationTimer++;}, 16); // 60FPS baby!
+  setInterval(function() {animationTimer++;}, 16); // 60FPS, baby! // TODO: 4K support
 
   // TODO: if we had a nice setScene method, this duplication would not be necessary...
   renderUpgrades(currentScene);
+  renderButtons(currentScene);
 
   $('.tab').on('click', function() {
     const clickedTab = $(this);
@@ -84,6 +162,7 @@ $(function(){
     // animations run in the first few seconds of scenes
     animationTimer = 0;
     renderUpgrades(currentScene);
+    renderButtons(currentScene);
     drawScene();
     $('.tab').removeClass('selected')
     clickedTab.addClass('selected');
@@ -201,6 +280,7 @@ $(function(){
 
   drawScene();
 
+  // FIXME: hide behind debug flag (with the recursive requestAnimationFrame it's a mess.)
   // debug: if CTRL is pressed, we display the mouse coords, log on click
   canvas.on('mousemove', function(e) {
     if (e.ctrlKey) {
