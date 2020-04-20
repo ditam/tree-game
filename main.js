@@ -190,6 +190,8 @@ function advanceMonth() {
     game.state.year++;
   }
 
+  game.animationTimer = 0;
+
   checkDeath();
 
   game.ui.updateToolbar();
