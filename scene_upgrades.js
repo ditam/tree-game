@@ -24,7 +24,7 @@ game.upgrades = {
 				id: 'up_b2',
 				name: 'Chlorophyll Reabsorption',
 				icon: 'icon-leaves',
-				description: 'Before dropping leaves, reabsorb their chrolophyll cells to regain resources.',
+				description: 'Before dropping leaves, reabsorb their chlorophyll cells to regain resources.',
 				costs: [100, 100, 50],
 				bought: false,
 			}
@@ -84,9 +84,10 @@ game.upgrades = {
 			},
 			{
 				id: 'up_r2',
-				name: 'Root Name 2',
+				name: 'Entomopathogens',
 				icon: 'icon-bug',
-				description: 'Root Desc 2',
+				description: 'The recruitment of organisms hostile to insects, mites and ticks protects from diseases and ' +
+                     'improves root longevity.',
 				costs: [50, 100, 200],
 				bought: false,
 			}
