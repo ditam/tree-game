@@ -118,15 +118,5 @@ game.objects = {
         {x: 1100, y: 0},
       ]
     },
-    {
-      color: 'white',
-      name: 'debug-box',
-      points: [
-        {x: 800,  y: 0},
-        {x: 900,  y: 0},
-        {x: 900,  y: 100},
-        {x: 800,  y: 100}
-      ]
-    },
   ]
 };
