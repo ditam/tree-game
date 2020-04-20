@@ -3,94 +3,94 @@ body {
   padding: 0;
   margin: 0;
   font-family: 'Open Sans', sans-serif;
-	user-select: none;
+  user-select: none;
 }
 
 .wrapper {
-	position: relative;
-	margin: 15px;
-	overflow: hidden;
+  position: relative;
+  margin: 15px;
+  overflow: hidden;
 }
 
 .wrapper .tabs {
-	width: 200px;
-	font-size: 32px;
-	font-weight: 700;
-	cursor: pointer;
+  width: 200px;
+  font-size: 32px;
+  font-weight: 700;
+  cursor: pointer;
 
-	background-image: url('assets/images/tree-silhouette.png');
+  background-image: url('assets/images/tree-silhouette.png');
 }
 
 .wrapper .tabs .tab {
-	width: 200px;
-	height: 200px;
-	line-height: 200px;
-	text-align: center;
-	color: rgba(255,255,255, 0.1);
-	text-transform: uppercase;
-	background-color: rgba(0, 50, 15, 0.95);
+  width: 200px;
+  height: 200px;
+  line-height: 200px;
+  text-align: center;
+  color: rgba(255,255,255, 0.1);
+  text-transform: uppercase;
+  background-color: rgba(0, 50, 15, 0.95);
 }
 
 .wrapper .tabs .tab.selected {
-	background-color: rgba(0, 50, 15, 0.85);
-	color: rgba(255,255,255, 0.5);
+  background-color: rgba(0, 50, 15, 0.85);
+  color: rgba(255,255,255, 0.5);
 }
 
 .wrapper .tabs .tab:hover {
-	background-color: rgba(0, 50, 15, 0.85);
+  background-color: rgba(0, 50, 15, 0.85);
 }
 
 .wrapper canvas {
-	position: absolute;
-	top: 0;
-	left: 200px; /* .tabs width */
+  position: absolute;
+  top: 0;
+  left: 200px; /* .tabs width */
 }
 
 /* Upgrade modal - header first */
 
 .wrapper #upgrade-modal {
-	position: absolute;
-	top: 50px;
-	left: 300px;
-	width: 700px;
-	height: 500px;
+  position: absolute;
+  top: 50px;
+  left: 300px;
+  width: 700px;
+  height: 500px;
 
-	transition: top 0.5s ease;
+  transition: top 0.5s ease;
 }
 
 .wrapper #upgrade-modal.hidden {
-	top: 550px;
+  top: 550px;
 }
 
 .wrapper #upgrade-modal > .header {
-	float: right;
-	width: 250px;
-	height: 50px;
+  float: right;
+  width: 250px;
+  height: 50px;
 
-	background-color: #485e69;
-	text-transform: uppercase;
-	cursor: pointer;
-	border: 1px solid #242040;
-	border-bottom: none;
-	border-top-left-radius: 15px;
-	border-top-right-radius: 15px;
+  background-color: #485e69;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid #242040;
+  border-bottom: none;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
 }
 
 .wrapper #upgrade-modal > .header .arrow {
-	display: inline-block;
-	width: 0;
-	border: 12px solid transparent;
-	border-top: 12px solid #b10a0a;
+  display: inline-block;
+  width: 0;
+  border: 12px solid transparent;
+  border-top: 12px solid #b10a0a;
 
-	margin-top: 20px;
-	margin-left: 12px;
+  margin-top: 20px;
+  margin-left: 12px;
 }
 
 .wrapper #upgrade-modal.hidden > .header .arrow {
-	border: 12px solid transparent;
-	border-bottom: 12px solid #b10a0a;
+  border: 12px solid transparent;
+  border-bottom: 12px solid #b10a0a;
 
-	margin-top: 6px;
+  margin-top: 6px;
   margin-left: 12px;
 }
 
@@ -110,60 +110,60 @@ body {
 /* Upgrade modal content */
 
 .wrapper #upgrade-modal .content {
-	float: right;
-	width: 100%;
-	height: calc(100% - 50px);
+  float: right;
+  width: 100%;
+  height: calc(100% - 50px);
 
-	border-radius: 5px;
-	border-top-right-radius: 0;
+  border-radius: 5px;
+  border-top-right-radius: 0;
 
-	background-color: rgba(15,80,5,0.7);
+  background-color: rgba(15,80,5,0.7);
 
-	color: white;
+  color: white;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, .7);
 }
 
 .wrapper #upgrade-modal .content .header,
 .wrapper #upgrade-modal .content .row-container {
-	padding: 20px;
+  padding: 20px;
 }
 
 .wrapper #upgrade-modal .content .row {
-	position: relative;
+  position: relative;
 }
 
 .wrapper #upgrade-modal .content .row + .row {
-	margin-top: 35px; /* not padding, to move the absolutely positioned items within */
+  margin-top: 35px; /* not padding, to move the absolutely positioned items within */
 }
 
 .wrapper #upgrade-modal .content .row .icon {
-	display: inline-block;
-	border: 2px solid black;
-	border-radius: 10px;
-	padding: 2px;
-	background-color: rgba(20,50,50,0.8);
+  display: inline-block;
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 2px;
+  background-color: rgba(20,50,50,0.8);
 }
 
 .wrapper #upgrade-modal .content .row .title {
-	position: absolute;
-	top: 0;
-	left: 85px;
-	font-weight: 700;
+  position: absolute;
+  top: 0;
+  left: 85px;
+  font-weight: 700;
 }
 
 .wrapper #upgrade-modal .content .row .description {
-	position: absolute;
-	top: 25px;
-	left: 85px;
-	max-width: 470px; /* so as not to overlay the buy/bought button */
+  position: absolute;
+  top: 25px;
+  left: 85px;
+  max-width: 470px; /* so as not to overlay the buy/bought button */
 }
 
 .wrapper #upgrade-modal .content .row .button {
-	position: absolute;
-	bottom: 0;
-	right: 0;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 
-	border: 1px solid darkgreen;
+  border: 1px solid darkgreen;
   background: green;
   border-radius: 5px;
   font-weight: 700;
@@ -172,11 +172,11 @@ body {
 }
 
 .wrapper #upgrade-modal .content .row .button {
-	position: absolute;
-	bottom: 0;
-	right: 0;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 
-	border: 1px solid darkgreen;
+  border: 1px solid darkgreen;
   background: green;
   border-radius: 5px;
   font-weight: 700;
@@ -185,79 +185,79 @@ body {
 }
 
 .wrapper #upgrade-modal .content .row .costs {
-	position: absolute;
-	top: 0;
-	right: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 /* layout adjustments for bought state */
 
 .wrapper #upgrade-modal .content .row:not(.bought) .button.bought {
-	display: none;
+  display: none;
 }
 
 .wrapper #upgrade-modal .content .row.bought .button.bought {
-	background: transparent;
-	cursor: auto;
+  background: transparent;
+  cursor: auto;
 }
 
 .wrapper #upgrade-modal .content .row.bought .button.buy {
-	display: none;
+  display: none;
 }
 
 .wrapper #upgrade-modal .content .row.bought .costs {
-	display: none;
+  display: none;
 }
 
 .wrapper #upgrade-modal .content .row.bought .icon {
-	background-color: green;
+  background-color: green;
 }
 
 /* Inlined resource icons */
 
 .resource {
-	font-weight: 700;
-	white-space: nowrap; /* this forbids wrapping the icon and text into separate lines */
+  font-weight: 700;
+  white-space: nowrap; /* this forbids wrapping the icon and text into separate lines */
 }
 
 .resource.carb {
-	color: #ffa500;
+  color: #ffa500;
 }
 
 .resource.stem {
-	color: darkgreen;
+  color: darkgreen;
 }
 
 .resource.water {
-	color: #000085;
+  color: #000085;
 }
 
 .resource.carb:before {
-	content: "";
-	display: inline-block;
-	background: url("assets/images/icon-carb.png") no-repeat;
-	background-size: contain;
-	width: 20px;
-	height: 20px;
-	margin: 0 6px 0 0;
+  content: "";
+  display: inline-block;
+  background: url("assets/images/icon-carb.png") no-repeat;
+  background-size: contain;
+  width: 20px;
+  height: 20px;
+  margin: 0 6px 0 0;
 }
 
 .resource.stem:before {
-	content: "";
-	display: inline-block;
-	background: url("assets/images/icon-stem.png") no-repeat;
-	background-size: contain;
-	width: 20px;
-	height: 20px;
-	margin: 0 6px 0 0;
+  content: "";
+  display: inline-block;
+  background: url("assets/images/icon-stem.png") no-repeat;
+  background-size: contain;
+  width: 20px;
+  height: 20px;
+  margin: 0 6px 0 0;
 }
 
 .resource.water:before {
-	content: "";
-	display: inline-block;
-	background: url("assets/images/icon-water.png") no-repeat;
-	background-size: contain;
-	width: 20px;
-	height: 20px;
-	margin: 0 6px 0 0;
+  content: "";
+  display: inline-block;
+  background: url("assets/images/icon-water.png") no-repeat;
+  background-size: contain;
+  width: 20px;
+  height: 20px;
+  margin: 0 6px 0 0;
 }
