@@ -209,6 +209,7 @@ function advanceMonth() {
   }
 
   game.animationTimer = 0;
+  game.setScene('branches');
 
   consumeResources();
 
