@@ -46,6 +46,8 @@ body {
 	left: 200px; /* .tabs width */
 }
 
+/* Upgrade modal - header first */
+
 .wrapper #upgrade-modal {
 	position: absolute;
 	top: 50px;
@@ -60,7 +62,7 @@ body {
 	top: 550px;
 }
 
-.wrapper #upgrade-modal .header {
+.wrapper #upgrade-modal > .header {
 	float: right;
 	width: 250px;
 	height: 50px;
@@ -74,7 +76,7 @@ body {
 	border-top-right-radius: 15px;
 }
 
-.wrapper #upgrade-modal .header .arrow {
+.wrapper #upgrade-modal > .header .arrow {
 	display: inline-block;
 	width: 0;
 	border: 12px solid transparent;
@@ -84,7 +86,7 @@ body {
 	margin-left: 12px;
 }
 
-.wrapper #upgrade-modal.hidden .header .arrow {
+.wrapper #upgrade-modal.hidden > .header .arrow {
 	border: 12px solid transparent;
 	border-bottom: 12px solid #b10a0a;
 
@@ -92,7 +94,7 @@ body {
   margin-left: 12px;
 }
 
-.wrapper #upgrade-modal .header .label {
+.wrapper #upgrade-modal > .header .label {
   position: absolute;
   font-size: 20px;
   top: 12px;
@@ -101,9 +103,11 @@ body {
   color: rgba(255,255,255,0.6);
 }
 
-.wrapper #upgrade-modal .header:hover .label {
+.wrapper #upgrade-modal > .header:hover .label {
   color: rgba(255,255,255,0.7);
 }
+
+/* Upgrade modal content */
 
 .wrapper #upgrade-modal .content {
 	float: right;
@@ -114,4 +118,142 @@ body {
 	border-top-right-radius: 0;
 
 	background-color: rgba(15,80,5,0.7);
+}
+
+.wrapper #upgrade-modal .content .header,
+.wrapper #upgrade-modal .content .row-container {
+	padding: 20px;
+}
+
+.wrapper #upgrade-modal .content .row {
+	position: relative;
+}
+
+.wrapper #upgrade-modal .content .row + .row {
+	margin-top: 35px; /* not padding, to move the absolutely positioned items within */
+}
+
+.wrapper #upgrade-modal .content .row .icon {
+	display: inline-block;
+	border: 2px solid black;
+	border-radius: 10px;
+	padding: 2px;
+	background-color: rgba(20,50,50,0.8);
+}
+
+.wrapper #upgrade-modal .content .row .title {
+	position: absolute;
+	top: 0;
+	left: 85px;
+	font-weight: 700;
+}
+
+.wrapper #upgrade-modal .content .row .description {
+	position: absolute;
+	top: 20px;
+	left: 85px;
+	max-width: 470px; /* so as not to overlay the buy/bought button */
+}
+
+.wrapper #upgrade-modal .content .row .button {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+
+	border: 1px solid darkgreen;
+  background: green;
+  border-radius: 5px;
+  font-weight: 700;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.wrapper #upgrade-modal .content .row .button {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+
+	border: 1px solid darkgreen;
+  background: green;
+  border-radius: 5px;
+  font-weight: 700;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.wrapper #upgrade-modal .content .row .costs {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+/* layout adjustments for bought state */
+
+.wrapper #upgrade-modal .content .row:not(.bought) .button.bought {
+	display: none;
+}
+
+.wrapper #upgrade-modal .content .row.bought .button.bought {
+	background: transparent;
+	cursor: auto;
+}
+
+.wrapper #upgrade-modal .content .row.bought .button.buy {
+	display: none;
+}
+
+.wrapper #upgrade-modal .content .row.bought .costs {
+	display: none;
+}
+
+.wrapper #upgrade-modal .content .row.bought .icon {
+	background-color: green;
+}
+
+/* Inlined resource icons */
+
+.resource {
+	font-weight: 700;
+}
+
+.resource.carb {
+	color: #ffa500;
+}
+
+.resource.stem {
+	color: darkgreen;
+}
+
+.resource.water {
+	color: #000085;
+}
+
+.resource.carb:before {
+	content: "";
+	display: inline-block;
+	background: url("assets/images/icon-carb.png") no-repeat;
+	background-size: contain;
+	width: 20px;
+	height: 20px;
+	margin: 0 6px 0 0;
+}
+
+.resource.stem:before {
+	content: "";
+	display: inline-block;
+	background: url("assets/images/icon-stem.png") no-repeat;
+	background-size: contain;
+	width: 20px;
+	height: 20px;
+	margin: 0 6px 0 0;
+}
+
+.resource.water:before {
+	content: "";
+	display: inline-block;
+	background: url("assets/images/icon-water.png") no-repeat;
+	background-size: contain;
+	width: 20px;
+	height: 20px;
+	margin: 0 6px 0 0;
 }

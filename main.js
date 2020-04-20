@@ -40,6 +40,26 @@ function initTextures(context) {
   game.textures.leaf = context.createPattern(patternCanvas, 'repeat');
 }
 
+function renderUpgrades(scene) {
+  const sceneUpgrades = game.upgrades[scene];
+  console.log('scene upg:', sceneUpgrades);
+  $('#upgrade-modal .content .header').html(sceneUpgrades.description);
+  sceneUpgrades.items.forEach(function(item, i) {
+    const row = $('#upgrade-modal .content .row').eq(i);
+    console.log('row for item:', row);
+    const icon = $('<img>').attr('src', 'assets/images/' + item.icon + '.png').css('width', '64px').css('height', '64px');
+    row.find('.icon').empty().append(icon);
+    row.find('.title').html(item.name);
+    row.find('.description').html(item.description);
+    let costsHTML = '';
+    ['carb', 'stem', 'water'].forEach(function(resource, index) {
+      costsHTML += '<span class="resource '+ resource +'">' + item.costs[index] + '</span> ';
+    });
+    row.find('.costs').html(costsHTML);
+    row.toggleClass('bought', item.bought);
+  });
+}
+
 $(function(){
   const canvas = $('canvas.main');
   const ctx = canvas[0].getContext('2d');
@@ -55,12 +75,15 @@ $(function(){
   let animationTimer = 0;
   setInterval(function() {animationTimer++;}, 16); // 60FPS baby!
 
+  // TODO: if we had a nice setScene method, this duplication would not be necessary...
+  renderUpgrades(currentScene);
+
   $('.tab').on('click', function() {
     const clickedTab = $(this);
     currentScene = scenes[clickedTab.index()];
     // animations run in the first few seconds of scenes
     animationTimer = 0;
-    console.log('scene set to:', currentScene);
+    renderUpgrades(currentScene);
     drawScene();
     $('.tab').removeClass('selected')
     clickedTab.addClass('selected');
@@ -119,7 +142,6 @@ $(function(){
   }
 
   function drawScene() {
-    console.log('__draw, time', animationTimer);
     clear();
     for (const o of game.objects[currentScene]) {
       // NB: if this ever becomes a performance issue, just drop it and the .shift() below
