@@ -18,7 +18,7 @@ const game = {
       water: 700,
     },
     tree: {
-      leaves: 0,
+      leaves: 12,
       branches: 1,
       trunkSize: 1,
       rootSize: 1,
@@ -144,6 +144,7 @@ function renderButtons(scene) {
       }
       payCost(cost);
       game.state.tree.leaves += leafBatchSize;
+      game.drawScene();
       game.ui.updateToolbar();
     });
   } else if (scene === 'trunk') {

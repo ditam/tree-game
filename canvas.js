@@ -95,14 +95,12 @@ game.drawScene = function() {
   }
 
   if (game.currentScene == 'branches') {
-    drawLeaf(ctx, 0, 0, 0, game.state.isOver || true);
-    drawLeaf(ctx, 110, 130, 0, game.state.isOver);
-    drawLeaf(ctx, 110, 130, 20, game.state.isOver || true);
-    drawLeaf(ctx, 110, 130, 30, game.state.isOver);
-    drawLeaf(ctx, 220, 305, 120, game.state.isOver || true);
-    drawLeaf(ctx, 580, 250, 140, game.state.isOver || true);
-    drawLeaf(ctx, 705, 165, 250, game.state.isOver);
-    drawLeaf(ctx, 705, 165, 200, game.state.isOver || true);
+    game.leaf_locations.forEach(function(o, i) {
+      if (i>=game.state.tree.leaves) {
+        return;
+      }
+      drawLeaf(ctx, o.x, o.y, o.angle, game.state.isOver);
+    });
   }
 
   if (game.animationTimer < 400) {
