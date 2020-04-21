@@ -131,12 +131,22 @@ function checkCapacity(objectName, attemptedAddCount) {
   return deciders[objectName](attemptedAddCount);
 }
 
+function getCostHTML(cost) {
+  let sHTML = '';
+  ['carb', 'stem', 'water'].forEach(function(res, i) {
+    sHTML += '<span class="resource '+res+'">' + cost[i] + '</span>';
+  });
+  return sHTML;
+}
+
 function renderButtons(scene) {
   $('#buttons-container').empty();
   if (scene === 'branches') {
     const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow new leaves');
-    $('#buttons-container').removeClass('alt').append(addLeavesButton);
     let cost = [50, 100, 350];
+    let costDisplay = $('<div>').addClass('cost-display').html(getCostHTML(cost));
+    $('#buttons-container').removeClass('alt').append(addLeavesButton);
+    $('#buttons-container').append(costDisplay);
     const leafBatchSize = 5; // TODO: move to params or make dynamic based on current count
     addLeavesButton.on('click', function() {
       if (game.state.isOver) { return; }
@@ -153,8 +163,10 @@ function renderButtons(scene) {
     });
 
     const dropLeavesButton = $('<div>').addClass('button drop-leaves').text('Drop all leaves');
-    $('#buttons-container').append(dropLeavesButton);
     cost = [1, 5, 0];
+    costDisplay = $('<div>').addClass('cost-display').html(getCostHTML(cost));
+    $('#buttons-container').append(dropLeavesButton);
+    $('#buttons-container').append(costDisplay);
     dropLeavesButton.on('click', function() {
       if (game.state.isOver) { return; }
       if (!checkCost(cost)) {
@@ -171,8 +183,10 @@ function renderButtons(scene) {
     });
   } else if (scene === 'trunk') {
     const addBranchButton = $('<div>').addClass('button add-branches').text('Grow branches');
-    $('#buttons-container').removeClass('alt').append(addBranchButton);
     let cost = [30, 100, 20];
+    let costDisplay = $('<div>').addClass('cost-display').html(getCostHTML(cost));
+    $('#buttons-container').removeClass('alt').append(addBranchButton);
+    $('#buttons-container').append(costDisplay);
     addBranchButton.on('click', function() {
       if (game.state.isOver) { return; }
       if (!checkCost(cost)) {
@@ -186,8 +200,10 @@ function renderButtons(scene) {
       game.ui.updateToolbar();
     });
     const addTrunkButton = $('<div>').addClass('button add-branches').text('Grow trunk');
-    $('#buttons-container').append(addTrunkButton);
     cost = [50, 200, 40];
+    costDisplay = $('<div>').addClass('cost-display').html(getCostHTML(cost));
+    $('#buttons-container').append(addTrunkButton);
+    $('#buttons-container').append(costDisplay);
     addTrunkButton.on('click', function() {
       if (game.state.isOver) { return; }
       if (!checkCost(cost)) {
@@ -199,8 +215,10 @@ function renderButtons(scene) {
     });
   } else if (scene === 'roots') {
     const growRootsButton = $('<div>').addClass('button add-branches').text('Grow perennial roots');
-    $('#buttons-container').addClass('alt').append(growRootsButton);
     let cost = [30, 150, 25];
+    let costDisplay = $('<div>').addClass('cost-display').html(getCostHTML(cost));
+    $('#buttons-container').addClass('alt').append(growRootsButton);
+    $('#buttons-container').append(costDisplay);
     growRootsButton.on('click', function() {
       if (game.state.isOver) { return; }
       if (!checkCost(cost)) {
@@ -211,8 +229,10 @@ function renderButtons(scene) {
       game.ui.updateToolbar();
     });
     const growFeederButton = $('<div>').addClass('button add-branches').text('Grow feeder roots');
-    $('#buttons-container').append(growFeederButton);
     cost = [10, 30, 10];
+    costDisplay = $('<div>').addClass('cost-display').html(getCostHTML(cost));
+    $('#buttons-container').append(growFeederButton);
+    $('#buttons-container').append(costDisplay);
     growFeederButton.on('click', function() {
       if (game.state.isOver) { return; }
       if (!checkCost(cost)) {

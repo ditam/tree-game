@@ -430,10 +430,12 @@ body {
   height: 35px;
   line-height: 35px;
   padding: 15px;
+  padding-top: 5px;
+  padding-bottom: 35px;
   border: 1px solid black;
   background-color: rgba(70,90,100,0.8);
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 
   border-radius: 15px;
   text-align: center;
@@ -442,9 +444,24 @@ body {
   color: rgba(255,255,255,0.8);
 }
 
+#buttons-container .cost-display + .button {
+  margin-top: 15px;
+}
+
+#buttons-container .button + .cost-display {
+  margin-top: -75px;
+  width: 180px;
+  text-align: center;
+}
+
 #buttons-container.alt .button {
   width: 220px;
 }
+
+#buttons-container.alt .button + .cost-display {
+  width: 240px;
+}
+
 
 #buttons-container .button:hover {
   color: rgba(255,255,255,0.6);
