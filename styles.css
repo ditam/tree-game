@@ -15,8 +15,24 @@ body {
 
 .wrapper .toolbar {
   width: 1150px;
-  background-color: #eee;
+  background-color: #eaeaea;
   height: 30px;
+}
+
+.wrapper .toolbar .resources {
+  position: absolute;
+  top: 5px;
+  left: 215px;
+}
+
+.wrapper .toolbar .resources .resource {
+  padding-right: 25px;
+}
+
+.wrapper .toolbar .calendar {
+  float: right;
+  padding: 10px;
+  line-height: 10px;
 }
 
 .wrapper .tabs {
@@ -403,13 +419,33 @@ body {
   top: 400px;
 }
 
-#buttons-container .button {
-  width: 100px;
-  height: 50px;
-  border: 1px solid black;
-  background-color: white;
-  cursor: pointer;
+#buttons-container.alt {
+  position: absolute;
+  left: 750px;
+  top: 250px;
 }
 
-#buttons-container .button.add-leaves {
+#buttons-container .button {
+  width: 150px;
+  height: 35px;
+  line-height: 35px;
+  padding: 15px;
+  border: 1px solid black;
+  background-color: rgba(70,90,100,0.8);
+  cursor: pointer;
+  margin-bottom: 20px;
+
+  border-radius: 15px;
+  text-align: center;
+  font-size: 18px;
+
+  color: rgba(255,255,255,0.8);
+}
+
+#buttons-container.alt .button {
+  width: 220px;
+}
+
+#buttons-container .button:hover {
+  color: rgba(255,255,255,0.6);
 }

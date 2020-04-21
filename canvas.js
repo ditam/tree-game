@@ -71,7 +71,12 @@ game.drawScene = function() {
     if (o.texture) {
       ctx.fillStyle = game.textures[o.texture];
     } else {
-      ctx.fillStyle = o.color || 'black';
+      if (o.name === 'cover' && [11, 0, 1].includes(game.state.month)) {
+        // In the winter months, the cover is snow
+        ctx.fillStyle = 'white';
+      } else {
+        ctx.fillStyle = o.color || 'black';
+      }
     }
     ctx.beginPath();
     let start = points.shift()

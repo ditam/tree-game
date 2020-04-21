@@ -7,6 +7,7 @@
   BRANCH_WEIGHT: 1,
   ROOT_CAPACITY: 2,
   BASE_WATER_LOSS: 2,
+  FEEDER_DURATION: 3,
   DEBUG: true,
 });
 
@@ -134,7 +135,7 @@ function renderButtons(scene) {
   $('#buttons-container').empty();
   if (scene === 'branches') {
     const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow new leaves');
-    $('#buttons-container').append(addLeavesButton);
+    $('#buttons-container').removeClass('alt').append(addLeavesButton);
     let cost = [50, 100, 350];
     const leafBatchSize = 5; // TODO: move to params or make dynamic based on current count
     addLeavesButton.on('click', function() {
@@ -170,8 +171,8 @@ function renderButtons(scene) {
     });
   } else if (scene === 'trunk') {
     const addBranchButton = $('<div>').addClass('button add-branches').text('Grow branches');
-    $('#buttons-container').append(addBranchButton);
-    const cost = [50, 100, 200];
+    $('#buttons-container').removeClass('alt').append(addBranchButton);
+    let cost = [30, 100, 20];
     addBranchButton.on('click', function() {
       if (game.state.isOver) { return; }
       if (!checkCost(cost)) {
@@ -184,14 +185,66 @@ function renderButtons(scene) {
       game.state.tree.branches++;
       game.ui.updateToolbar();
     });
+    const addTrunkButton = $('<div>').addClass('button add-branches').text('Grow trunk');
+    $('#buttons-container').append(addTrunkButton);
+    cost = [50, 200, 40];
+    addTrunkButton.on('click', function() {
+      if (game.state.isOver) { return; }
+      if (!checkCost(cost)) {
+        return;
+      }
+      payCost(cost);
+      game.state.tree.trunkSize++;
+      game.ui.updateToolbar();
+    });
+  } else if (scene === 'roots') {
+    const growRootsButton = $('<div>').addClass('button add-branches').text('Grow perennial roots');
+    $('#buttons-container').addClass('alt').append(growRootsButton);
+    let cost = [30, 150, 25];
+    growRootsButton.on('click', function() {
+      if (game.state.isOver) { return; }
+      if (!checkCost(cost)) {
+        return;
+      }
+      payCost(cost);
+      game.state.tree.rootSize++;
+      game.ui.updateToolbar();
+    });
+    const growFeederButton = $('<div>').addClass('button add-branches').text('Grow feeder roots');
+    $('#buttons-container').append(growFeederButton);
+    cost = [10, 30, 10];
+    growFeederButton.on('click', function() {
+      if (game.state.isOver) { return; }
+      if (!checkCost(cost)) {
+        return;
+      }
+      payCost(cost);
+      game.state.tree.hasFeeder = true;
+      game.state.tree.feederAge = 0;
+      game.ui.updateToolbar();
+    });
   }
 }
 
 function consumeResources() {
   const leaves = game.state.tree.leaves;
-  game.state.resources.carb += leaves;
+  if (game.state.month > 2 && game.state.month < 10) {
+    game.state.resources.carb += leaves;
+  }
   game.state.resources.water -= leaves;
   game.state.resources.water -= PARAMS.BASE_WATER_LOSS;
+
+  if (game.state.tree.hasFeeder) {
+    game.state.resources.water += 100;
+    game.state.tree.feederAge++;
+
+    const upgrade = game.utils.getUpgradeByID('up_r2');
+    const bonus = upgrade.bought? 3 : 0;
+    if (game.state.tree.feederAge >= PARAMS.FEEDER_DURATION + bonus) {
+      game.state.tree.hasFeeder = false;
+      game.state.tree.feederAge = undefined;
+    }
+  }
 }
 
 function checkDeath() {
