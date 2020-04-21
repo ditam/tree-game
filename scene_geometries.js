@@ -211,7 +211,7 @@ game.objects = {
       ]
     },
     {
-      color: 'brown',
+      color: '#524a3f',
       name: 'ground',
       points: [
         {x: 0,  y: 200},
@@ -225,7 +225,7 @@ game.objects = {
       ]
     },
     {
-      color: '#423206',
+      color: 'rgb(76,39,17)',
       name: 'tree',
       outlined: true,
       outlineColor: 'black',
