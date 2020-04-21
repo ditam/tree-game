@@ -13,12 +13,13 @@ const game = {
   textures: {},
   state: { // NB: whenever you change the state, update the UI, at least the toolbar
     resources: {
-      carb: 150,
+      carb: 50,
       stem: 300,
-      water: 700,
+      water: 100,
     },
     tree: {
       leaves: 12,
+      areLeavesDropping: false,
       branches: 1,
       trunkSize: 1,
       rootSize: 1,
@@ -54,8 +55,8 @@ function initTextures(context) {
   game.textures.leaf = context.createPattern(patternCanvas, 'repeat');
 }
 
-function renderUpgrades(scene) {
-  const sceneUpgrades = game.upgrades[scene];
+function renderUpgrades() {
+  const sceneUpgrades = game.upgrades[game.currentScene];
   $('#upgrade-modal .content .header').html(sceneUpgrades.description);
   sceneUpgrades.items.forEach(function(item, i) {
     const row = $('#upgrade-modal .content .row').eq(i);
@@ -63,11 +64,12 @@ function renderUpgrades(scene) {
     row.find('.icon').empty().append(icon);
     row.find('.title').html(item.name);
     row.find('.description').html(item.description);
-    let costsHTML = '';
+    let costHTML = '';
     ['carb', 'stem', 'water'].forEach(function(resource, index) {
-      costsHTML += '<span class="resource '+ resource +'">' + item.costs[index] + '</span> ';
+      costHTML += '<span class="resource '+ resource +'">' + item.cost[index] + '</span> ';
     });
-    row.find('.costs').html(costsHTML);
+    row.find('.cost').html(costHTML);
+    row.find('.button.buy').data('upgrade-id', item.id);
     row.toggleClass('bought', item.bought);
   });
 }
@@ -132,7 +134,7 @@ function renderButtons(scene) {
   if (scene === 'branches') {
     const addLeavesButton = $('<div>').addClass('button add-leaves').text('Grow new leaves');
     $('#buttons-container').append(addLeavesButton);
-    const cost = [50, 100, 350];
+    let cost = [50, 100, 350];
     const leafBatchSize = 5; // TODO: move to params or make dynamic based on current count
     addLeavesButton.on('click', function() {
       if (game.state.isOver) { return; }
@@ -144,6 +146,24 @@ function renderButtons(scene) {
       }
       payCost(cost);
       game.state.tree.leaves += leafBatchSize;
+      game.drawScene();
+      game.ui.updateToolbar();
+    });
+
+    const dropLeavesButton = $('<div>').addClass('button drop-leaves').text('Drop all leaves');
+    $('#buttons-container').append(dropLeavesButton);
+    cost = [1, 5, 0];
+    dropLeavesButton.on('click', function() {
+      if (game.state.isOver) { return; }
+      if (!checkCost(cost)) {
+        return;
+      }
+      payCost(cost);
+      if (game.utils.getUpgradeByID('up_b2').bought) {
+        game.state.tree.areLeavesDropping = true;
+      } else {
+        game.state.tree.leaves = 0;
+      }
       game.drawScene();
       game.ui.updateToolbar();
     });
@@ -211,6 +231,11 @@ function advanceMonth() {
   game.animationTimer = 0;
   game.setScene('branches');
 
+  if (game.state.tree.areLeavesDropping) {
+    game.state.tree.leaves = 0;
+    game.state.tree.areLeavesDropping = false;
+  }
+
   consumeResources();
 
   checkDeath();
@@ -222,7 +247,7 @@ game.setScene = function(scene) {
   game.currentScene = scene;
   // animations run in the first few seconds of scenes
   game.animationTimer = 0;
-  renderUpgrades(game.currentScene);
+  renderUpgrades();
   renderButtons(game.currentScene);
   game.drawScene();
   $('.wrapper .tab').removeClass('selected');
@@ -240,6 +265,18 @@ $(function(){
   $('#upgrade-modal .header').on('click', function() {
     if (game.state.isOver) { return; }
     $('#upgrade-modal').toggleClass('hidden');
+  });
+
+  $('#upgrade-modal').on('click', '.row .button.buy', function() {
+    const id = $(this).data('upgrade-id');
+    const upgrade = game.utils.getUpgradeByID(id);
+    console.log('upgrade is:', upgrade);
+    if(!checkCost(upgrade.cost)) {
+      return;
+    }
+    payCost(upgrade.cost);
+    upgrade.bought = true;
+    renderUpgrades();
   });
 
   $('#time-controls').on('click', function() {

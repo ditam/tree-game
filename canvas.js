@@ -23,8 +23,14 @@ function drawLeaf(ctx, x0, y0, rotationInDegrees, isFalling) {
   // NB: first move, then rotate, so that we rotate around the new origin
   ctx.rotate(rotation + rotationOffset);
 
-  ctx.fillStyle = game.textures[leaf.texture];
-  ctx.strokeStyle = leaf.outlineColor || 'black';
+  const upgrade = game.utils.getUpgradeByID('up_b2');
+  if (game.state.tree.areLeavesDropping && upgrade.bought) {
+    ctx.fillStyle = 'rgb(255,200,0)';
+    ctx.strokeStyle = 'rgb(90,0,20)';
+  } else {
+    ctx.fillStyle = game.textures[leaf.texture];
+    ctx.strokeStyle = leaf.outlineColor || 'black';
+  }
   ctx.lineWidth = PARAMS.OUTLINE_WIDTH;
 
   ctx.beginPath();

@@ -195,7 +195,7 @@ body {
   cursor: pointer;
 }
 
-.wrapper #upgrade-modal .content .row .costs {
+.wrapper #upgrade-modal .content .row .cost {
   position: absolute;
   top: 0;
   right: 0;
@@ -216,7 +216,7 @@ body {
   display: none;
 }
 
-.wrapper #upgrade-modal .content .row.bought .costs {
+.wrapper #upgrade-modal .content .row.bought .cost {
   display: none;
 }
 

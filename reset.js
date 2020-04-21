@@ -3,7 +3,7 @@ game._upgrades = game.utils.clone(game.state);
 
 game.resetState = function() {
   game.state = game.utils.clone(game._state);
-  game._upgrades = game.utils.clone(game._upgrades);
+  game.upgrades = game.utils.clone(game._upgrades);
   game.animationTimer = 0;
 
   game.ui.updateToolbar();
