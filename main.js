@@ -6,6 +6,7 @@
   TRUNK_WEIGHT: 1,
   BRANCH_WEIGHT: 1,
   ROOT_CAPACITY: 2,
+  BASE_WATER_LOSS: 2,
   DEBUG: true,
 });
 
@@ -190,6 +191,7 @@ function consumeResources() {
   const leaves = game.state.tree.leaves;
   game.state.resources.carb += leaves;
   game.state.resources.water -= leaves;
+  game.state.resources.water -= PARAMS.BASE_WATER_LOSS;
 }
 
 function checkDeath() {
