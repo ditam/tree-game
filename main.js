@@ -242,6 +242,7 @@ function renderButtons(scene) {
       game.state.tree.hasFeeder = true;
       game.state.tree.feederAge = 0;
       game.ui.updateToolbar();
+      game.drawScene();
     });
   }
 }
