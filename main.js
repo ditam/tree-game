@@ -282,11 +282,14 @@ function consumeResources() {
 function checkDeath() {
   function endGame(message) {
     game.state.isOver = true;
-    $('#game-over-modal .message').text(message);
+    $('#game-over-modal .message').html(message);
     $('#game-over-modal').removeClass('hidden');
     $('#game-over-modal .button').on('click', game.resetState);
     $('.wrapper .tabs').addClass('game-over');
   }
+
+  let message = '';
+
   // if the biomass exceeds the root capacity, the tree topples over
   const branches = game.state.tree.branches;
   const wBranch = PARAMS.BRANCH_WEIGHT;
@@ -303,6 +306,30 @@ function checkDeath() {
   if (game.state.resources.water < 0) {
     message = 'After using up all of its water reserves, it could not sustain its ' +
               ' most fundamental functions.';
+    endGame(message);
+    return;
+  }
+
+  // if you're doing too well for too long, humans will cut you down...
+  const allUpgradesBought = [
+    'up_b0', 'up_b1', 'up_b2',
+    'up_t0', 'up_t1', 'up_t2',
+    'up_r0', 'up_r1', 'up_r2',
+  ].every(function(id) {
+    return game.utils.getUpgradeByID(id).bought;
+  });
+
+  if (
+    allUpgradesBought &&
+    game.state.year > 19 &&
+    game.state.resources.carb > 1000 &&
+    game.state.resources.stem > 1000 &&
+    game.state.resources.water > 1000
+  ) {
+    message = 'Being the tallest and healthiest tree in the area, you\'ve attracted the interest of humans. ' +
+              'They cut you down for timber.' +
+              '<br/><br/>You did as well as you could.' +
+              '<br/><br/>Thank you for playing!';
     endGame(message);
     return;
   }
