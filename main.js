@@ -254,6 +254,8 @@ function consumeResources() {
   game.state.resources.water -= leaves;
   game.state.resources.water -= PARAMS.BASE_WATER_LOSS;
 
+  game.state.resources.stem += game.state.tree.trunkSize * 20;
+
   if (game.state.tree.hasFeeder) {
     game.state.resources.water += 100;
     game.state.tree.feederAge++;
