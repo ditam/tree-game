@@ -250,19 +250,28 @@ function renderButtons(scene) {
 function consumeResources() {
   const leaves = game.state.tree.leaves;
   if (game.state.month > 2 && game.state.month < 10) {
-    game.state.resources.carb += leaves;
+    const lightMultiplier = game.utils.getUpgradeByID('up_b0').bought? 1.4 : 1;
+    game.state.resources.carb += Math.floor(leaves * lightMultiplier);
   }
-  game.state.resources.water -= leaves;
+
+  const waterLossRate = game.utils.getUpgradeByID('up_b1').bought? 0.7 : 1;
+  game.state.resources.water -= Math.floor(leaves * waterLossRate);
   game.state.resources.water -= PARAMS.BASE_WATER_LOSS;
 
   game.state.resources.stem += game.state.tree.trunkSize * 20;
 
+  const partnershipUpgrade = game.utils.getUpgradeByID('up_r1');
+  if (game.utils.getUpgradeByID('up_r0').bought) {
+    const carbEfficiency = partnershipUpgrade.bought? 13 : 10;
+    game.state.resources.carb += game.state.tree.rootSize * carbEfficiency;
+  }
+
   if (game.state.tree.hasFeeder) {
-    game.state.resources.water += 100;
+    game.state.resources.water += partnershipUpgrade.bought? 150 : 100;
     game.state.tree.feederAge++;
 
-    const upgrade = game.utils.getUpgradeByID('up_r2');
-    const bonus = upgrade.bought? 3 : 0;
+    const feederUpgrade = game.utils.getUpgradeByID('up_r2');
+    const bonus = feederUpgrade.bought? 3 : 0;
     if (game.state.tree.feederAge >= PARAMS.FEEDER_DURATION + bonus) {
       game.state.tree.hasFeeder = false;
       game.state.tree.feederAge = undefined;
@@ -348,7 +357,6 @@ $(function(){
   $('#upgrade-modal').on('click', '.row .button.buy', function() {
     const id = $(this).data('upgrade-id');
     const upgrade = game.utils.getUpgradeByID(id);
-    console.log('upgrade is:', upgrade);
     if(!checkCost(upgrade.cost)) {
       return;
     }
@@ -400,6 +408,13 @@ $(function(){
       if (e.ctrlKey) {
         const coords = game.utils.getCoords(canvas, e);
         console.log(JSON.stringify(coords) + ',');
+        // add resources if click in bottom left :)
+        if (coords.x < 20 && coords.y > 580) {
+          game.state.resources.carb += 1000;
+          game.state.resources.stem += 1000;
+          game.state.resources.water += 1000;
+          game.ui.updateToolbar();
+        }
       }
     });
   }
